@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration SYSTEM "http://mybatis.org/dtd/mybatis-3-config.dtd" >
+<configuration>
+	 <typeAliases>
+         <typeAlias type="kewei.manager.bean.User" alias="user"/>
+         <typeAlias type="kewei.manager.bean.JiShuDian" alias="jsd"/>
+         <typeAlias type="kewei.manager.bean.Menu" alias="menu"/>
+         <typeAlias type="kewei.manager.bean.Article" alias="article"/>
+         <typeAlias type="kewei.manager.bean.Apply" alias="apply"/>
+         <typeAlias type="kewei.manager.bean.Company" alias="company"/>
+    </typeAliases>
+</configuration>

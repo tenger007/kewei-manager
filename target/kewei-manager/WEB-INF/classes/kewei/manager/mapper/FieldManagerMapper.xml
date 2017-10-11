@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kewei.manager.mapper.FieldManagerMapper">
+   <select id="queryExpertContentById" parameterType="long" resultType="kewei.manager.bean.Expert">
+   select * from expert where id=#{id}
+   </select>
+
+    <update id="updateExpertcontent" parameterType="kewei.manager.bean.Expert">
+    update expert set title=#{title},name=#{name},summary=#{summary},pbdate=#{pbdate},content=#{content},keyword=#{keyword} where id = #{id}
+    </update>   
+    
+    <insert id="insertExpertcontent" parameterType="kewei.manager.bean.Expert">
+    insert into expert (id,fieldid,title,name,summary,keyword,pbdate,content)
+    values (#{id},#{fieldid},#{title},#{name},#{summary},#{keyword},#{pbdate},#{content})
+    </insert>
+    
+    <delete id="delete_expert_by_id" parameterType="long">
+    delete from expert where id=#{id}
+    </delete>
+    
+    <select id="queryFieldExperts4Page" resultType="kewei.manager.bean.Expert">
+    select a.* from expert a 
+        <where>
+            and a.fieldid = #{fieldid} 
+        </where>
+         limit #{start}, #{size} 
+    </select>
+    
+     <select id="queryFieldExpertCount4Page" resultType="int">
+    select count(a.id) from expert a 
+        <where>
+            and a.fieldid = #{fieldid}
+        </where>
+   </select>
+</mapper>

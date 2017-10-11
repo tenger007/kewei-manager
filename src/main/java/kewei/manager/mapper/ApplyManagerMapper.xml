@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kewei.manager.mapper.ApplyManagerMapper">
+    
+    <select id="selectCount" resultType="int">
+    select count(id) from apply where status=0
+    </select>
+    
+    <select id="get_all_user" resultType="String" >
+    select name from user where name != 'admin'
+    </select>
+    
+    <select id="get_all_apply" resultType="kewei.manager.bean.Apply">
+    select a.* from apply a 
+    </select>
+    
+    <select id="query_source_ById" resultType="kewei.manager.bean.Source">
+    select * from source where id = #{id}
+    </select>
+    
+    <select id="get_apply_by_id" resultType="kewei.manager.bean.Temp_menu">
+    select * from temp_menu where applyid = #{id}
+    </select>
+    
+    <insert id="insert_temp_menu" parameterType="kewei.manager.bean.Temp_menu">
+    insert ignore into temp_menu(fid,name,applyid) values (#{fid},#{name},#{applyid})
+    </insert>
+   
+   <delete id="delete_temp_menu_id" parameterType="Long">
+   delete from temp_menu where id = #{id}
+   </delete>
+   
+  <select id="select_temp_menuId_fid" parameterType="long" resultType="long">
+    select id from temp_menu where fid=#{id} 
+   </select>
+    
+    <select id="queryApplyDisImessage" parameterType="Long" resultType="String">
+    select imessage from apply_imessage where applyid=#{id}
+    </select>
+    
+    <select id="query_maxId" resultType="Long">
+    select max(id) from temp_menu
+    </select>
+    
+    <update id="update_menu" parameterType="kewei.manager.bean.Temp_menu">
+    update temp_menu set name=#{name} where id=#{id}
+    </update>
+    
+     <select id="queryApplysPage" resultType="kewei.manager.bean.Apply">
+     select * from
+	(select * from apply where status != 4
+            <if test="querytext != null">
+            and jsdname like concat('%', #{querytext}, '%') 
+            </if>
+      order by apply_time desc )a
+     union
+     select * from (select * from apply where status = 4  
+            <if test="querytext != null">
+            and jsdname like concat('%', #{querytext}, '%') 
+            </if>
+      order by apply_time desc)b   limit #{start}, #{size} 
+    </select>
+    
+     <select id="queryApplyCount4Page" resultType="int">
+    select count(*) from apply 
+            <if test="querytext != null">
+            where jsdname like concat('%', #{querytext}, '%')   
+            </if>
+       
+   </select>
+   
+     <select id="query_new_ApplysPage" resultType="kewei.manager.bean.Apply">
+    select * from apply where status in(0,3)
+            <if test="querytext != null">
+            and jsdname like concat('%', #{querytext}, '%')
+            </if>
+     order by apply_time desc    limit #{start}, #{size} 
+    </select>
+    
+     <select id="query_new_ApplyCount4Page" resultType="int">
+    select count(*) from apply where status in (0,3)
+            <if test="querytext != null">
+            and jsdname like concat('%', #{querytext}, '%')   
+            </if>
+       
+   </select>
+   
+   <insert id="agreeApply_imessageByid" >
+   insert ignore into apply_imessage(imessage,applyid)
+   values
+   (#{1},#{0}) 
+   </insert>
+   
+   <insert id="setImessageToApplyid">
+   insert ignore into apply_imessage(id,imessage,applyid)
+   values
+   (0,#{1},#{0}) 
+   </insert>
+   
+    <update id="agreeApplyByid"  >
+   update apply set status=3 where id = #{0}
+   </update>
+   
+    <update id="sendEmailApplyByid"  >
+   update apply set status=4 where id = #{0}
+   </update>
+   
+    <update id="agreeApplyByids"  >
+   update apply set status=2 where id in 
+   <foreach collection="ids" item="id" open="(" close=")" separator=",">
+        #{id}
+   </foreach>
+   </update>
+   
+    <update id="completeApplyByid"  >
+   update apply set status=1 where id =#{id} 
+   </update>
+   
+   <insert id="sendEmail">
+   <foreach collection="ids" item="id" separator=",">
+   insert ignore into apply_imessage(imessage,applyid)
+   values(#{imessages},
+        #{id})
+   </foreach>
+   </insert>
+   
+   <update id="disagreeApplyByid"  >
+   update apply set status=2 where id = #{0}
+   </update>
+    
+</mapper>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kewei.manager.mapper.UserManagerMapper">
+    <select id="queryUser4Login" parameterType="kewei.manager.bean.User" resultType="kewei.manager.bean.User">
+        select
+           *
+        from user
+        where loginname = #{loginname} and password = #{password}
+    </select>
+    
+    <select id="queryUserIdByName" parameterType="String" resultType="Integer">
+        select
+           id
+        from user
+        where loginname = #{loginname} 
+    </select>
+   
+    <select id="query_all_user" resultType="kewei.manager.bean.User">
+    select * from user 
+    </select>
+    
+    <insert id="insert_user_permission" parameterType="Integer">
+    insert into user_permission(userid,permissionid) values (#{0},#{1})
+    </insert>
+    
+    <insert id="insert_user" parameterType="kewei.manager.bean.User">
+    insert into user(id,name,password,loginname) values (#{id},#{name},#{password},#{loginname})
+    </insert>
+    
+    <update id="edit_User" parameterType="kewei.manager.bean.User">
+    update user set password = #{password} where name = #{name}
+     </update>
+    
+    <delete id="delete_user_id">
+    delete from user where id = #{id}
+    </delete>
+</mapper>

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kewei.manager.mapper.UserManagerMapper">
+    <select id="queryUser4Login" parameterType="kewei.manager.bean.User" resultType="kewei.manager.bean.User">
+        select
+           *
+        from user
+        where loginname = #{loginname} and password = #{password}
+    </select>
+    
+    <select id="selectImessageCount" resultType="int">
+    select count(id) from user_imessage where status = 0 and loginname!='Admin'
+    </select>
+    
+    <select id="select_Other_ImessageCount" resultType="int" parameterType="String">
+    select count(id) from user_imessage where status = 0 and loginname='Admin' and sendname= #{loginname}
+    </select>
+    
+    <select id="queryUserIdByName" parameterType="String" resultType="Integer">
+        select
+           id
+        from user
+        where loginname = #{loginname} 
+    </select>
+   
+   <update id="setStatusImessage" parameterType="kewei.manager.bean.User_imessage"  >
+    <foreach collection="list" item="item" index="index" open="" close="" separator=";">  
+                update user_imessage  
+                set status =1
+                where id = #{item.id}  
+         </foreach>  
+   </update>
+   
+    <select id="query_all_user" resultType="kewei.manager.bean.User">
+    select * from user 
+    </select>
+    
+    <select id="queryUser_imessages4Page" resultType="kewei.manager.bean.User_imessage">
+    select * from user_imessage where status = 0 and loginname!='Admin' order by sendtime desc  limit #{start}, #{size} 
+    </select>
+    
+    <select id="queryUser_imessageCount4Page" resultType="int">
+    select count(id) from user_imessage where status = 0  and loginname!='Admin'
+    </select>
+    
+    <select id="query_all_User_imessageCount4Page" resultType="int">
+    select count(id) from user_imessage  where loginname!='Admin'
+    </select>
+    
+    <select id="query_all_User_imessages4Page" resultType="kewei.manager.bean.User_imessage">
+    select * from user_imessage where loginname!='Admin' order by sendtime desc limit #{start}, #{size}
+    </select>
+    
+    <select id="query_OtherUser_imessageCount4Page" resultType="int">
+     select count(id) from user_imessage  where loginname='Admin' and sendname = #{userName} and status = 0
+    </select>
+    
+    <select id="query_OtherUser_all_imessageCount4Page" resultType="int">
+     select count(id) from user_imessage  where loginname='Admin' and sendname = #{userName}
+    </select>
+    
+    <select id="query_OtherUser_imessages4Page" resultType="kewei.manager.bean.User_imessage">
+    select * from user_imessage where loginname='Admin' and sendname = #{userName} and status = 0 order by sendtime desc limit #{start}, #{size}
+    </select>
+    
+    <select id="query_OtherUser_all_imessages4Page" resultType="kewei.manager.bean.User_imessage">
+    select * from user_imessage where loginname='Admin' and sendname = #{userName} order by sendtime desc limit #{start}, #{size}
+    </select>
+    
+    <insert id="insert_user_permission" parameterType="Integer">
+    insert ignore into user_permission(userid,permissionid) values (#{0},#{1})
+    </insert>
+    
+    <insert id="insert_user" parameterType="kewei.manager.bean.User">
+    insert ignore into user(id,name,password,loginname) values (#{id},#{name},#{password},#{loginname})
+    </insert>
+    
+    <update id="edit_User" parameterType="kewei.manager.bean.User">
+    update user set password = #{password} where name = #{name}
+     </update>
+    
+    <insert id="send_User_imessage" parameterType="kewei.manager.bean.User_imessage">
+    insert ignore into  user_imessage(loginname,imessage,status,jsdname,sendname) values(#{loginname},#{imessage},#{status},#{jsdname},#{sendname}) 
+    </insert>
+    
+    <delete id="delete_user_id">
+    delete from user where id = #{id}
+    </delete>
+    
+    <select id="query_menu_by_user_jsd" resultType="String">
+  select b.name from menu b where b.id in (
+ select menuid from user_menu where jsdname=#{0} and username=#{1} and menuid not in (select a.fid from menu a))
+    </select>
+    
+    <select id="query_user_by_jsd" resultType="String">
+    select username from user_menu where jsdname=#{jsdname} group by username
+    </select>
+    
+    <select id="queryUser_menusPageByField" resultType="String">
+    select jsdname from user_menu
+            <if test="querytext != null">
+            where fieldname = #{querytext} group by jsdname
+            </if>
+         limit #{start}, #{size} 
+    </select>
+    
+    <select id="query_StatusByName" resultType="Integer">
+   select status from user_menu where jsdname = #{1} and username=#{0} group by status
+    </select>
+    
+     <select id="queryUser_menuCount4PageByField" resultType="int">
+       select count(a.id) from (select * from user_menu
+       <if test="querytext != null">
+              where fieldname = #{querytext} group by jsdname )a
+       </if>
+   </select>
+   
+    <select id="queryUser_menusPageByJsd" resultType="String">
+    select fieldname from user_menu
+            <if test="querytext != null">
+            where jsdname = #{querytext} group by jsdname
+            </if>
+         limit #{start}, #{size} 
+    </select>
+    <select id="queryUser_menuCount4PageByJsd" resultType="int">
+       select count(a.fieldname) from (select fieldname from user_menu
+       <if test="querytext != null">
+              where jsdname = #{querytext} group by jsdname )a
+       </if>
+   </select>
+    <select id="queryUser_menusPageByUser" resultType="kewei.manager.bean.User_menu">
+    select * from user_menu
+            <if test="querytext != null">
+            where username = #{querytext} group by jsdname
+            </if>
+         limit #{start}, #{size} 
+    </select>
+    <select id="queryUser_menuCount4PageByUser" resultType="int">
+       select count(a.jsdname) from (select jsdname from user_menu
+       <if test="querytext != null">
+              where username = #{querytext} group by jsdname )a
+       </if>
+   </select>
+</mapper>

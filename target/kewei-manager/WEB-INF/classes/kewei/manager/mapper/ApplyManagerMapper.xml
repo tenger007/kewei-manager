@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kewei.manager.mapper.ApplyManagerMapper">
+    
+    <select id="selectCount" resultType="int">
+    select count(id) from apply where status=0
+    </select>
+    
+    <select id="get_all_user" resultType="String" >
+    select name from user where name != 'admin'
+    </select>
+    
+    <select id="get_all_apply" resultType="kewei.manager.bean.Apply">
+    select a.* from apply a where a.status=0 
+    </select>
+    
+    <select id="get_apply_by_id" resultType="kewei.manager.bean.Temp_menu">
+    select * from temp_menu where applyid = #{id}
+    </select>
+    
+    <insert id="insert_temp_menu" parameterType="kewei.manager.bean.Temp_menu">
+    insert into temp_menu(fid,name,applyid) values (#{fid},#{name},#{applyid})
+    </insert>
+   
+   <delete id="delete_menu_id" parameterType="Long">
+   delete from temp_menu where id = #{id}
+   </delete>
+    
+    <select id="query_maxId" resultType="Long">
+    select max(id) from temp_menu
+    </select>
+    
+    <update id="update_menu" parameterType="kewei.manager.bean.Temp_menu">
+    update temp_menu set name=#{name} where id=#{id}
+    </update>
+    
+     <select id="queryApplysPage" resultType="kewei.manager.bean.Apply">
+    select * from apply where status = 0
+            <if test="querytext != null">
+            and jsdname like concat('%', #{querytext}, '%') 
+            </if>
+         limit #{start}, #{size} 
+    </select>
+    
+     <select id="queryApplyCount4Page" resultType="int">
+    select count(*) from apply where status = 0
+        
+            <if test="querytext != null">
+            and jsdname like concat('%', #{querytext}, '%')   
+            </if>
+       
+   </select>
+   
+   <update id="agreeApplyByid" parameterType="int" >
+   update apply set status=1, imessage='已同意' where id = #{id}
+   </update>
+   
+   <update id="disagreeApplyByid"  >
+   update apply set status=2, imessage=#{1} where id = #{0}
+   </update>
+    
+</mapper>

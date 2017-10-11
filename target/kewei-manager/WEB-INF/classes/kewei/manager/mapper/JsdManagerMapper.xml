@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kewei.manager.mapper.JsdManagerMapper">
+   <insert id="insert_jsds" parameterType="kewei.manager.bean.JiShuDian">
+    insert into jishudian values
+    <foreach collection="list" item="item" separator=",">
+			(#{item.id},#{item.jsds},#{item.jsdid},#{item.menuid},#{item.menuname},#{item.img})
+		</foreach>
+    </insert>
+    
+    <select id="query_field" resultType="String">
+    select name fieldName from field
+    </select>
+    
+    <select id="query_max_jsdid" resultType="Long">
+    select max(id) from jishudian
+    </select>
+    
+    <insert id="insert_company" parameterType="kewei.manager.bean.Company">
+    insert into company(jsdid,name,lat,lon,addr) values (#{jsdid},#{name},#{lat},#{lon},#{addr})
+    </insert>
+    
+    <insert id="insert_us_article" parameterType="kewei.manager.bean.Us_article">
+    insert into us_article(abst,access_num,ana_desc,article_type,author,classification,cont_num,data_base,duc_type
+    ,duc_url,pbdate,language,page_count,title,pb_title,year,pb_location,rep_num,source_disc,subject) 
+    values (#{abst},#{access_num},#{ana_desc},#{article_type},#{author},#{classification},#{cont_num},#{data_base}
+    ,#{duc_type},#{duc_url},#{pbdate},#{language},#{page_count},#{title},#{pb_title},#{year},#{pb_location},#{rep_num},#{source_disc},#{subject})
+    </insert>
+    
+    <select id="query_jsdId_by_jsdName" resultType="long" parameterType="String">
+    select id from jishudian where name=#{jsdName}
+    </select>
+    
+    <select id="query_jsd_by_fieldName" parameterType="String" resultType="String">
+    select b.name jsdName from field a left join jishudian b on a.id = b.fieldid where a.name=#{fieldName}
+    </select>
+    <select id="query_GenZongJsd_by_fieldName" parameterType="String" resultType="String">
+    select b.name jsdName from field a left join jishudian b on a.id = b.fieldid where a.name=#{fieldName}
+    and b.isgenzongjishudian=1
+    </select>
+    
+    <update id="update_jsd_genzong" parameterType="long">
+    update jishudian set isgenzongjishudian = 1 where id=#{jsdid}
+    </update>
+    
+     <update id="update_jsd" parameterType="kewei.manager.bean.JiShuDian">
+     update jishudian set civil=#{civil},fieldid=#{fieldid},keyword=#{keyword},international=#{international},
+     isgenzongjishudian=#{isgenzongjishudian},score=#{score},scoreexpert=#{scoreexpert},isqianyanjishudian=#{isqianyanjishudian},
+     ismainfield=#{ismainfield},enname=#{en_name} where name=#{name} 
+     <!-- update jishudian set civil=#{civil},international=#{international},num=#{num}
+     where id=#{id} -->
+    </update>
+    
+    <update id="update_jsdimg">
+    update jishudian set img=#{1} where id = #{0}
+    </update>
+    
+    <select id="query_jsdDto_by_id" parameterType="Long" resultType="kewei.manager.bean.JsdDto">
+    select a.id,a.name jsdName,enname,a.keyword,a.img,civil,international,case WHEN isgenzongjishudian ='1' then '是' else '否' end as isGenZongJsd,
+    isqianyan isQianYan,case WHEN isqianyanjishudian ='1' then '是' else '否' end as isQianYanJsd ,
+    case WHEN ismainfield ='1' then '是' else '否' end as isMainField ,year,
+    score,scorejigou scoreJigou
+    ,scorezazhi scoreZazhi,scoredb scoreDb,scoreexpert scoreExpert
+    ,b.name fieldName from jishudian a left join field b on a.fieldid=b.id where a.id = #{id}
+    </select>
+    
+    <delete id="delete_jsd_id" parameterType="Long">
+    delete from jishudian where id = #{id}
+    </delete>
+    
+    <delete id="delete_jsds_ids">
+        delete from jishudian where id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+        #{id}
+        </foreach>
+    </delete>
+    
+    <select id="query_fieldid_by_fieldName" resultType="Long">
+    select id from field where name = #{fieldName}
+    </select>
+    
+    <insert id="insert_jsd" parameterType="kewei.manager.bean.JiShuDian">
+    insert into jishudian (civil,fieldid,international,num,isgenzongjishudian,score,scoreexpert,
+    isqianyanjishudian,ismainfield,name,year,updatetime,img,definition,enname,id,fid)values(#{civil},#{fieldid},#{international},#{num},#{isgenzongjishudian},#{score},#{scoreexpert},#{isqianyanjishudian},#{ismainfield}
+  	,#{name},#{year},#{updatetime},#{img},#{definition},#{en_name},#{id},#{fid})
+    </insert>
+    
+    <insert id="insert_field" parameterType="String">
+    insert into field(name)values(#{0})
+    </insert>
+    
+    <select id="get_all_jsdDto" resultType="kewei.manager.bean.JsdDto">
+    select a.id,a.name jsdName,year,score,scorejigou scoreJigou
+    ,scorezazhi scoreZazhi,scoredb scoreDb,scoreexpert scoreExpert
+    ,b.name fieldName from jishudian a left join field b on a.fieldid=b.id
+    </select>
+    
+     <select id="queryJsds4Page" resultType="kewei.manager.bean.JsdDto">
+    select a.id,a.name jsdName,year,score,scorejigou scoreJigou
+    ,scorezazhi scoreZazhi,scoredb scoreDb,scoreexpert scoreExpert
+    ,b.name fieldName from jishudian a left join field b on a.fieldid=b.id
+        <where>
+            and b.name = #{fieldName} 
+        </where>
+        ${order} 
+         limit #{start}, #{size} 
+    </select>
+    
+     <select id="queryJsdCount4Page" resultType="int">
+    select count(a.id) from jishudian a left join field b on a.fieldid=b.id
+        <where>
+            and b.name = #{fieldName}
+        </where>
+   </select>
+</mapper>
